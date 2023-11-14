@@ -60,8 +60,8 @@ all: main-build
 main-build: Gyrosensor.elf secondary-outputs
 
 # Tool invocations
-Gyrosensor.elf Gyrosensor.map: $(OBJS) $(USER_OBJS) /home/maximilian/STM32CubeIDE/workspace_1.13.2/Gyrosensor/STM32L073RZTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Gyrosensor.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"/home/maximilian/STM32CubeIDE/workspace_1.13.2/Gyrosensor/STM32L073RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Gyrosensor.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Gyrosensor.elf Gyrosensor.map: $(OBJS) $(USER_OBJS) /home/maximilian/Git/MPU6050/Gyrosensor/STM32L073RZTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Gyrosensor.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"/home/maximilian/Git/MPU6050/Gyrosensor/STM32L073RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Gyrosensor.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

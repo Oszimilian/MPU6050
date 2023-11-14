@@ -200,8 +200,10 @@ uint8_t read_mpu6050_gyro(I2C_HandleTypeDef* i2c_ptr, Gyro* gyrovalue) {
 	uint8_t data[6];
 
 	if(HAL_I2C_Mem_Read(i2c_ptr, MPU6050_ADDR, GYRO_XOUT_H_REG, 1, data, 6, 100) == HAL_OK) {
-		gyrovalue->x.val = (float)(((data[0] << 8) | data[1]) / 131.0);
+		uint16_t x = ((data[0] << 8) | data[1]);
+		gyrovalue->x.val = x / 131.0;
 		float_to_myfloat(&gyrovalue->x.val, &gyrovalue->x);
+
 
 		gyrovalue->y.val = (float)(((data[2] << 8) | data[3]) / 131.0);
 		float_to_myfloat(&gyrovalue->y.val, &gyrovalue->y);
