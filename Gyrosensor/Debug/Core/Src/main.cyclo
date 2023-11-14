@@ -1,0 +1,17 @@
+../Core/Src/main.c:107:10:strlen	2
+../Core/Src/main.c:116:6:uart_send_string	2
+../Core/Src/main.c:126:6:uart_send_byte	1
+../Core/Src/main.c:133:6:uart_send_temp	1
+../Core/Src/main.c:139:6:uart_send_gyro	1
+../Core/Src/main.c:145:6:uart_send_acc	1
+../Core/Src/main.c:151:6:float_to_myfloat	1
+../Core/Src/main.c:156:9:init_mpu6050	6
+../Core/Src/main.c:183:9:read_mpu6050_temp	2
+../Core/Src/main.c:199:9:read_mpu6050_gyro	2
+../Core/Src/main.c:219:9:read_mpu6050_acc	2
+../Core/Src/main.c:247:5:main	6
+../Core/Src/main.c:320:6:SystemClock_Config	4
+../Core/Src/main.c:370:13:MX_I2C1_Init	4
+../Core/Src/main.c:418:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:453:13:MX_GPIO_Init	1
+../Core/Src/main.c:492:6:Error_Handler	1
