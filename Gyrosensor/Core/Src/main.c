@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "mpu6050.h"
 #include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -86,7 +87,7 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+MPU6050_t MPU6050;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,12 +134,15 @@ void uart_send_byte(uint8_t* data) {
 void uart_send_temp(Temp* temperature) {
 	char c[20];
 	sprintf(c, "Temp: %d.%d °C \r\n", temperature->t.l, temperature->t.r);
+
 	uart_send_string(c);
 }
 
 void uart_send_gyro(Gyro* gyro) {
 	char c[100];
-	sprintf(c, "Gyro x: %d.%d ° \r\nGyro y: %d.%d ° \r\nGyro z: %d.%d ° \r\n", gyro->x.l, gyro->x.r, gyro->y.l, gyro->y.r, gyro->z.l, gyro->z.r);
+	//sprintf(c, "Gyro x: %d.%d ° \r\nGyro y: %d.%d ° \r\nGyro z: %d.%d ° \r\n", gyro->x.l, gyro->x.r, gyro->y.l, gyro->y.r, gyro->z.l, gyro->z.r);
+	//sprintf(c, "Gyro x: %f \r\nGyro y: %f\r\n Gyro z: %f\r\n", gyro->x.val, gyro->y.val, gyro->z.val);
+	sprintf(c, "%f %f %f \r\n",gyro->x.val, gyro->y.val, gyro->z.val);
 	uart_send_string(c);
 }
 
@@ -201,14 +205,21 @@ uint8_t read_mpu6050_gyro(I2C_HandleTypeDef* i2c_ptr, Gyro* gyrovalue) {
 
 	if(HAL_I2C_Mem_Read(i2c_ptr, MPU6050_ADDR, GYRO_XOUT_H_REG, 1, data, 6, 100) == HAL_OK) {
 		uint16_t x = ((data[0] << 8) | data[1]);
-		gyrovalue->x.val = x / 131.0;
+		gyrovalue->x.val = x / (131 * 0.001);
+		//gyrovalue->x.val = (x / 131.0 - 151) * 0.2 * -1 * 0.15;
+		//gyrovalue->x.val = (float)(((data[0] << 8) | data[1]));
 		float_to_myfloat(&gyrovalue->x.val, &gyrovalue->x);
 
-
-		gyrovalue->y.val = (float)(((data[2] << 8) | data[3]) / 131.0);
+		uint16_t y = ((data[2] << 8) | data[3]);
+		gyrovalue->y.val = y / (131 * 0.001);
+		//gyrovalue->y.val = (float)(((data[2] << 8) | data[3]) / 131.0);
+		//gyrovalue->y.val = (float)(((data[2] << 8) | data[3]));
 		float_to_myfloat(&gyrovalue->y.val, &gyrovalue->y);
 
-		gyrovalue->z.val = (float)(((data[4] << 8) | data[5]) / 131.0);
+		uint16_t z = ((data[4] << 8) | data[5]);
+		gyrovalue->z.val = z / (131 * 0.001);
+		//gyrovalue->z.val = (float)(((data[4] << 8) | data[5]) / 131.0);
+		//gyrovalue->z.val = (float)(((data[4] << 8) | data[5]));
 		float_to_myfloat(&gyrovalue->z.val, &gyrovalue->z);
 
 		return SUCCESS;
@@ -273,8 +284,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  init_mpu6050(&hi2c1);
-
+  //init_mpu6050(&hi2c1);
+  while (MPU6050_Init(&hi2c1) == 1);
 
   Temp temperatur;
   Gyro gyro;
@@ -290,25 +301,33 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  if (HAL_GPIO_ReadPin(BlueButton_GPIO_Port, BlueButton_Pin)) {
+	  //if (HAL_GPIO_ReadPin(BlueButton_GPIO_Port, BlueButton_Pin)) {
+		  /*
 		  if(read_mpu6050_temp(&hi2c1, &temperatur) == SUCCESS) {
 			  uart_send_temp(&temperatur);
 		  }
+		  */
 
-		  if(read_mpu6050_gyro(&hi2c1, &gyro) == SUCCESS) {
-			  uart_send_gyro(&gyro);
-		  }
+	  MPU6050_Read_All(&hi2c1, &MPU6050);
+	  HAL_Delay (100);
 
+	  	  char c[50];
+
+	  	  sprintf(c, "%f %f \r\n", MPU6050.KalmanAngleX, MPU6050.KalmanAngleY);
+
+	  	  uart_send_string(c);
+		  /*
 		  if(read_mpu6050_acc(&hi2c1, &acc) == SUCCESS) {
 			  uart_send_acc(&acc);
 		  }
+		  */
 
-		  while(HAL_GPIO_ReadPin(BlueButton_GPIO_Port, BlueButton_Pin)) {
-			  HAL_Delay(50);
-		  }
-		  HAL_Delay(50);
-		  uart_send_string("\r\n\r\n");
-	  }
+		  //while(HAL_GPIO_ReadPin(BlueButton_GPIO_Port, BlueButton_Pin)) {
+			  //HAL_Delay(50);
+		  //}
+
+		  //uart_send_string("\r\n\r\n");
+	  //}
 
 
   }
